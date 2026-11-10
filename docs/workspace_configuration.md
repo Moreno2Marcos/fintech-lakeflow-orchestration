@@ -8,7 +8,7 @@ Import the assets from `00_setup/`, `01_tasks/`, `02_validation/`, and `03_dashb
 
 Retain the task notebook names and folder names so that they can be referenced by the job. Notebook filenames in GitHub include language extensions; verify the actual imported notebook paths when assigning them to job tasks.
 
-The SQL query exports use `.dbquery.ipynb`. Import or recreate the saved queries in Databricks SQL. In particular, the `ingesting_customers` task references the saved query exported as `01_tasks/02_ingesting_customers_sql.dbquery.ipynb`.
+The saved SQL queries are provided as `.sql` files. Create saved queries in Databricks SQL using their SQL contents. In particular, the `ingesting_customers` task references the saved query exported as `01_tasks/02_ingesting_customers_sql.sql`.
 
 ## 2. Replace the job template placeholders
 
@@ -43,9 +43,9 @@ Most Python tasks read catalog and schema widgets. The following assets also con
 
 - `00_setup/00_environment_setup.sql`
 - `01_tasks/01_ingesting_applications.py`
-- `01_tasks/02_ingesting_customers_sql.dbquery.ipynb`
-- `02_validation/01_validate_customers_staging_sql.dbquery.ipynb`
-- `02_validation/02_query_staging_tables_sql.dbquery.ipynb`
+- `01_tasks/02_ingesting_customers_sql.sql`
+- `02_validation/01_validate_customers_staging_sql.sql`
+- `02_validation/02_query_staging_tables_sql.sql`
 - Dataset queries in `03_dashboards/fintech_credit_operations_dashboard.lvdash.json`
 
 If you choose another catalog or schema, update these literal references, the volume paths in environment setup, and the job parameters together. Changing the job parameters alone does not retarget every asset.

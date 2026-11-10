@@ -15,7 +15,7 @@ The project processes synthetic customer, credit application, and installment da
 | `jobs/` | The final recovery and monitoring job JSON | Record task dependencies, branching, iteration, compute, and retry settings. |
 | `docs/` | Workspace configuration notes | Explain the values required when reproducing the project. |
 
-The `.py` and `.sql` notebook exports retain Databricks cell markers and Markdown cells. The `.dbquery.ipynb` files are saved SQL query exports. The workflow uses Databricks services, including Spark, Delta tables, Unity Catalog volumes, and a SQL warehouse.
+The `.py` and `.sql` notebook exports retain Databricks cell markers and Markdown cells. The saved SQL queries are provided as `.sql` files. The workflow uses Databricks services, including Spark, Delta tables, Unity Catalog volumes, and a SQL warehouse.
 
 ## Final job configuration
 
