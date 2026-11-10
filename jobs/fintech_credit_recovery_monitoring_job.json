@@ -1,0 +1,242 @@
+{
+  "name": "fintech_credit_recovery_monitoring_job",
+  "email_notifications": {
+    "no_alert_for_skipped_runs": false
+  },
+  "webhook_notifications": {},
+  "timeout_seconds": 0,
+  "max_concurrent_runs": 1,
+  "tasks": [
+    {
+      "task_key": "ingesting_applications",
+      "run_if": "ALL_SUCCESS",
+      "notebook_task": {
+        "notebook_path": "<WORKSPACE_PROJECT_ROOT>/01_tasks/01_ingesting_applications",
+        "source": "WORKSPACE"
+      },
+      "timeout_seconds": 0,
+      "email_notifications": {},
+      "webhook_notifications": {},
+      "disabled": false
+    },
+    {
+      "task_key": "ingesting_customers",
+      "run_if": "ALL_SUCCESS",
+      "sql_task": {
+        "query": {
+          "query_id": "<CUSTOMERS_QUERY_ID>"
+        },
+        "warehouse_id": "<SQL_WAREHOUSE_ID>"
+      },
+      "timeout_seconds": 0,
+      "email_notifications": {},
+      "webhook_notifications": {},
+      "disabled": false
+    },
+    {
+      "task_key": "customers_applications_report",
+      "depends_on": [
+        {
+          "task_key": "ingesting_customers"
+        },
+        {
+          "task_key": "ingesting_applications"
+        }
+      ],
+      "run_if": "ALL_SUCCESS",
+      "notebook_task": {
+        "notebook_path": "<WORKSPACE_PROJECT_ROOT>/01_tasks/05_joining_customers_applications",
+        "source": "WORKSPACE"
+      },
+      "timeout_seconds": 0,
+      "email_notifications": {},
+      "webhook_notifications": {},
+      "disabled": false
+    },
+    {
+      "task_key": "customers_applications_state_report_iterator",
+      "depends_on": [
+        {
+          "task_key": "customers_applications_report"
+        }
+      ],
+      "run_if": "ALL_SUCCESS",
+      "for_each_task": {
+        "inputs": "[\"PE\", \"SP\", \"RJ\", \"MG\", \"BA\"]",
+        "concurrency": 1,
+        "task": {
+          "task_key": "customers_applications_state_report",
+          "run_if": "ALL_SUCCESS",
+          "notebook_task": {
+            "notebook_path": "<WORKSPACE_PROJECT_ROOT>/01_tasks/08_applications_by_state",
+            "base_parameters": {
+              "state": "{{input}}"
+            },
+            "source": "WORKSPACE"
+          },
+          "timeout_seconds": 0,
+          "email_notifications": {},
+          "webhook_notifications": {},
+          "disabled": false
+        }
+      },
+      "timeout_seconds": 0,
+      "email_notifications": {},
+      "webhook_notifications": {},
+      "disabled": false
+    },
+    {
+      "task_key": "ingesting_installments",
+      "run_if": "ALL_SUCCESS",
+      "notebook_task": {
+        "notebook_path": "<WORKSPACE_PROJECT_ROOT>/01_tasks/03_ingesting_installments",
+        "source": "WORKSPACE"
+      },
+      "timeout_seconds": 0,
+      "email_notifications": {},
+      "webhook_notifications": {},
+      "disabled": false
+    },
+    {
+      "task_key": "customers_installments_summary",
+      "depends_on": [
+        {
+          "task_key": "ingesting_installments"
+        },
+        {
+          "task_key": "ingesting_customers"
+        }
+      ],
+      "run_if": "ALL_SUCCESS",
+      "notebook_task": {
+        "notebook_path": "<WORKSPACE_PROJECT_ROOT>/01_tasks/04_joining_customers_installments",
+        "source": "WORKSPACE"
+      },
+      "timeout_seconds": 0,
+      "email_notifications": {},
+      "webhook_notifications": {},
+      "disabled": false
+    },
+    {
+      "task_key": "checking_for_duplicates",
+      "depends_on": [
+        {
+          "task_key": "customers_installments_summary"
+        }
+      ],
+      "run_if": "ALL_SUCCESS",
+      "condition_task": {
+        "op": "EQUAL_TO",
+        "left": "{{tasks.customers_installments_summary.values.has_duplicates}}",
+        "right": "true"
+      },
+      "timeout_seconds": 0,
+      "email_notifications": {},
+      "webhook_notifications": {},
+      "disabled": false
+    },
+    {
+      "task_key": "dropping_duplicate_records",
+      "depends_on": [
+        {
+          "task_key": "checking_for_duplicates",
+          "outcome": "true"
+        }
+      ],
+      "run_if": "ALL_SUCCESS",
+      "notebook_task": {
+        "notebook_path": "<WORKSPACE_PROJECT_ROOT>/01_tasks/06_dropping_duplicate_installments",
+        "source": "WORKSPACE"
+      },
+      "timeout_seconds": 0,
+      "email_notifications": {},
+      "webhook_notifications": {},
+      "disabled": false
+    },
+    {
+      "task_key": "transforming_applications_by_state",
+      "depends_on": [
+        {
+          "task_key": "customers_applications_state_report_iterator"
+        }
+      ],
+      "run_if": "ALL_SUCCESS",
+      "notebook_task": {
+        "notebook_path": "<WORKSPACE_PROJECT_ROOT>/01_tasks/09_transforming_applications_by_state",
+        "source": "WORKSPACE"
+      },
+      "max_retries": 0,
+      "min_retry_interval_millis": 900000,
+      "retry_on_timeout": false,
+      "disable_auto_optimization": false,
+      "timeout_seconds": 0,
+      "email_notifications": {},
+      "webhook_notifications": {},
+      "disabled": false
+    },
+    {
+      "task_key": "transforming_customers_installments",
+      "depends_on": [
+        {
+          "task_key": "dropping_duplicate_records"
+        },
+        {
+          "task_key": "checking_for_duplicates",
+          "outcome": "false"
+        }
+      ],
+      "run_if": "NONE_FAILED",
+      "notebook_task": {
+        "notebook_path": "<WORKSPACE_PROJECT_ROOT>/01_tasks/07_transforming_customers_installments",
+        "source": "WORKSPACE"
+      },
+      "timeout_seconds": 0,
+      "email_notifications": {},
+      "webhook_notifications": {},
+      "disabled": false
+    },
+    {
+      "task_key": "refreshing_fintech_dashboard",
+      "depends_on": [
+        {
+          "task_key": "transforming_applications_by_state"
+        },
+        {
+          "task_key": "transforming_customers_installments"
+        }
+      ],
+      "run_if": "ALL_SUCCESS",
+      "dashboard_task": {
+        "subscription": {
+          "attachment": {
+            "page_attachment": {}
+          }
+        },
+        "warehouse_id": "<SQL_WAREHOUSE_ID>",
+        "dashboard_id": "<DASHBOARD_ID>"
+      },
+      "timeout_seconds": 0,
+      "email_notifications": {},
+      "webhook_notifications": {},
+      "disabled": false
+    }
+  ],
+  "queue": {
+    "enabled": true
+  },
+  "parameters": [
+    {
+      "name": "catalog",
+      "default": "workspace"
+    },
+    {
+      "name": "schema",
+      "default": "fintech_jobs"
+    },
+    {
+      "name": "simulate_duplicate",
+      "default": "false"
+    }
+  ],
+  "performance_target": "PERFORMANCE_OPTIMIZED"
+}

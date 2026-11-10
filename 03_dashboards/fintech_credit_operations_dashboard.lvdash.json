@@ -1,0 +1,372 @@
+{
+  "datasets": [
+    {
+      "name": "a3a66b8a",
+      "displayName": "application_kpis",
+      "queryLines": [
+        "SELECT\r\n",
+        "    COUNT(*) AS application_count,\r\n",
+        "    COUNT(DISTINCT customer_id) AS customer_count,\r\n",
+        "    SUM(requested_amount) AS total_requested_amount,\r\n",
+        "    SUM(\r\n",
+        "        CASE WHEN is_approved THEN 1 ELSE 0 END\r\n",
+        "    ) AS approved_application_count\r\n",
+        "FROM workspace.fintech_jobs.customers_applications_gold;"
+      ]
+    },
+    {
+      "name": "935ab479",
+      "displayName": "applications_by_state",
+      "queryLines": [
+        "SELECT\r\n",
+        "    state,\r\n",
+        "    application_count,\r\n",
+        "    customer_count,\r\n",
+        "    total_requested_amount,\r\n",
+        "    approved_application_count\r\n",
+        "FROM workspace.fintech_jobs.customers_applications_state_summary_gold\r\n",
+        "ORDER BY state;"
+      ]
+    },
+    {
+      "name": "81d23b60",
+      "displayName": "applications_by_status",
+      "queryLines": [
+        "SELECT\r\n",
+        "    status,\r\n",
+        "    COUNT(*) AS application_count,\r\n",
+        "    SUM(requested_amount) AS total_requested_amount\r\n",
+        "FROM workspace.fintech_jobs.customers_applications_gold\r\n",
+        "GROUP BY status\r\n",
+        "ORDER BY status;"
+      ]
+    },
+    {
+      "name": "533b850b",
+      "displayName": "installments_by_payment_status",
+      "queryLines": [
+        "SELECT\r\n",
+        "    payment_status,\r\n",
+        "    COUNT(*) AS installment_count,\r\n",
+        "    SUM(amount_due) AS total_amount_due\r\n",
+        "FROM workspace.fintech_jobs.customers_installments_curated\r\n",
+        "GROUP BY payment_status\r\n",
+        "ORDER BY payment_status;"
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "name": "f17e8feb",
+      "displayName": "Credit Operations Overview",
+      "layout": [
+        {
+          "widget": {
+            "name": "total-applications",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "a3a66b8a",
+                  "fields": [
+                    {
+                      "name": "sum(application_count)",
+                      "expression": "SUM(`application_count`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Total Applications",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(application_count)"
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 2,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "application-kpis",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "a3a66b8a",
+                  "fields": [
+                    {
+                      "name": "sum(total_requested_amount)",
+                      "expression": "SUM(`total_requested_amount`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Total Requested Amount",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(total_requested_amount)",
+                  "format": {
+                    "type": "number-plain",
+                    "abbreviation": "none",
+                    "decimalPlaces": {
+                      "type": "exact",
+                      "places": 2
+                    }
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 3,
+            "width": 2,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "requested-amount-by-state",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "935ab479",
+                  "fields": [
+                    {
+                      "name": "state",
+                      "expression": "`state`"
+                    },
+                    {
+                      "name": "sum(total_requested_amount)",
+                      "expression": "SUM(`total_requested_amount`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Requested Amount by State",
+                  "fields": []
+                }
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "state",
+                  "axis": {
+                    "hideTitle": true
+                  },
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "sum(total_requested_amount)",
+                  "axis": {
+                    "hideTitle": true
+                  },
+                  "format": {
+                    "type": "number-plain",
+                    "abbreviation": "none",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 2
+                    }
+                  },
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 5,
+            "y": 0,
+            "width": 3,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "applications-by-status",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "81d23b60",
+                  "fields": [
+                    {
+                      "name": "status",
+                      "expression": "`status`"
+                    },
+                    {
+                      "name": "sum(application_count)",
+                      "expression": "SUM(`application_count`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Applications by Status",
+                  "fields": []
+                }
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "status",
+                  "axis": {
+                    "hideTitle": true
+                  },
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "sum(application_count)",
+                  "axis": {
+                    "hideTitle": true
+                  },
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 2,
+            "y": 0,
+            "width": 3,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "installments-payment-status",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "533b850b",
+                  "fields": [
+                    {
+                      "name": "payment_status",
+                      "expression": "`payment_status`"
+                    },
+                    {
+                      "name": "installment_count",
+                      "expression": "`installment_count`"
+                    },
+                    {
+                      "name": "total_amount_due",
+                      "expression": "`total_amount_due`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Installments by Payment Status",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "payment_status",
+                    "displayName": "Payment Status"
+                  },
+                  {
+                    "fieldName": "installment_count",
+                    "displayName": "Installmnet Count"
+                  },
+                  {
+                    "fieldName": "total_amount_due",
+                    "displayName": "Total Amount Due"
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 8,
+            "y": 0,
+            "width": 4,
+            "height": 6
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    }
+  ],
+  "uiSettings": {
+    "theme": {
+      "widgetHeaderAlignment": "ALIGNMENT_UNSPECIFIED"
+    },
+    "applyModeEnabled": false
+  }
+}
