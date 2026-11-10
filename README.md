@@ -31,21 +31,11 @@ The implementation uses synthetic data: five customers, six applications, and si
 
 The job has two reporting branches: credit applications and installments. They share customer data and converge at the dashboard refresh.
 
-```mermaid
-flowchart TD
-    C["Ingest customers"] --> A["Join customers and applications"]
-    S["Ingest applications"] --> A
-    C --> I["Join customers and installments"]
-    F["Ingest installment CSV files"] --> I
-    A --> L["For each of five states"]
-    L --> G["Application details and state summary"]
-    I --> Q{"Exact duplicate rows?"}
-    Q -->|Yes| D["Remove duplicates"]
-    Q -->|No| T["Standardize installment data"]
-    D --> T
-    G --> R["Refresh credit dashboard"]
-    T --> R
-```
+![Complete Lakeflow job workflow with full task names, nested state processing, duplicate branches, and dashboard dependencies](docs/images/lakeflow_job_workflow.svg)
+
+[Open the full-size workflow diagram](docs/images/lakeflow_job_workflow.svg).
+
+Each node includes its exact task key from the job JSON. The blue For each group contains the nested state-report task; its outgoing dependency waits for all five iterations to succeed.
 
 The [final job template](jobs/fintech_credit_recovery_monitoring_job.json) contains 11 top-level tasks and one nested state-report task. State iterations run sequentially with concurrency set to 1.
 
