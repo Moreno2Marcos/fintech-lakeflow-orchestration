@@ -4,6 +4,8 @@ This guide identifies the values needed to use the exported notebooks, saved SQL
 
 ## 1. Preserve the project paths
 
+Each notebook has a rendered `.ipynb` preview with the saved output available in the supplied HTML export. The adjacent `.py` or `.sql` file is its source export. Import one version of each notebook and verify the resulting notebook path before assigning it to a job task.
+
 Import the assets from `00_setup/`, `01_tasks/`, `02_validation/`, and `03_dashboards/` into a workspace project folder named `fintech-lakeflow-orchestration`.
 
 Retain the task notebook names and folder names so that they can be referenced by the job. Notebook filenames in GitHub include language extensions; verify the actual imported notebook paths when assigning them to job tasks.
