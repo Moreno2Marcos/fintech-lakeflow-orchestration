@@ -16,7 +16,7 @@ The notebook previews below contain the Markdown cells, code, and saved outputs 
 | Transformations | [Installments](01_tasks/07_transforming_customers_installments.ipynb) · [State reports](01_tasks/08_applications_by_state.ipynb) · [Application consolidation](01_tasks/09_transforming_applications_by_state.ipynb) |
 | Validation and monitoring | [Dynamic workflow validation](02_validation/03_validate_dynamic_workflow_outputs.ipynb) · [Recovery output validation](02_validation/04_validate_recovery_monitoring_outputs.ipynb) · [Job run monitoring](02_validation/05_monitor_fintech_job_runs.ipynb) |
 
-Open these `.ipynb` links for the notebook presentation. The adjacent `.py` and `.sql` files provide the source code. An `.ipynb` file is a notebook container; the environment setup notebook contains SQL cells, while the three saved SQL queries remain `.sql` files.
+The `.ipynb` notebooks contain the source code, formatted Markdown, and captured outputs. Each notebook has one canonical file. The environment setup notebook contains SQL cells; the three standalone saved SQL queries remain `.sql` files.
 
 ### Captured output coverage
 
@@ -24,7 +24,7 @@ The previews preserve all tables and text outputs embedded in the supplied expor
 
 - The export contains no saved execution output for `09_transforming_applications_by_state`. Its preview links to the captured validation results for the persisted tables.
 - `02_failure_handling_monitoring_setup` is a Markdown exercise and completion record.
-- The environment setup export contains a cached SQL parse error attached to a Markdown cell. That recorded error is retained and labeled as exported output.
+- An obsolete SQL parse error attached to a Markdown cell was removed from the environment setup preview. Its code cells, result tables, and text outputs are preserved.
 - The notebook-only HTML export does not contain results for the three saved SQL queries.
 
 ## Project files
@@ -38,7 +38,7 @@ The previews preserve all tables and text outputs embedded in the supplied expor
 | `jobs/` | The final recovery and monitoring job JSON | Record task dependencies, branching, iteration, compute, and retry settings. |
 | `docs/` | Workspace configuration notes | Explain the values required when reproducing the project. |
 
-The `.py` and `.sql` notebook exports retain Databricks cell markers and Markdown cells. The saved SQL queries are provided as `.sql` files. The workflow uses Databricks services, including Spark, Delta tables, Unity Catalog volumes, and a SQL warehouse.
+The `.ipynb` notebooks preserve Markdown, executable code cells, and the available recorded outputs. The saved SQL queries are provided as `.sql` files. The workflow uses Databricks services, including Spark, Delta tables, Unity Catalog volumes, and a SQL warehouse.
 
 ## Final job configuration
 

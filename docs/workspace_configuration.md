@@ -4,11 +4,11 @@ This guide identifies the values needed to use the exported notebooks, saved SQL
 
 ## 1. Preserve the project paths
 
-Each notebook has a rendered `.ipynb` preview with the saved output available in the supplied HTML export. The adjacent `.py` or `.sql` file is its source export. Import one version of each notebook and verify the resulting notebook path before assigning it to a job task.
+Each notebook is provided once as an `.ipynb` file containing its source code, Markdown, and the saved outputs available in the supplied HTML export. Import each notebook and verify the resulting notebook path before assigning it to a job task.
 
 Import the assets from `00_setup/`, `01_tasks/`, `02_validation/`, and `03_dashboards/` into a workspace project folder named `fintech-lakeflow-orchestration`.
 
-Retain the task notebook names and folder names so that they can be referenced by the job. Notebook filenames in GitHub include language extensions; verify the actual imported notebook paths when assigning them to job tasks.
+Retain the task notebook names and folder names so that they can be referenced by the job. Notebook filenames in GitHub use the `.ipynb` extension; verify the actual imported notebook paths when assigning them to job tasks.
 
 The saved SQL queries are provided as `.sql` files. Create saved queries in Databricks SQL using their SQL contents. In particular, the `ingesting_customers` task references the saved query exported as `01_tasks/02_ingesting_customers_sql.sql`.
 
@@ -43,8 +43,8 @@ The fixture uses the `workspace` catalog and `fintech_jobs` schema. The saved jo
 
 Most Python tasks read catalog and schema widgets. The following assets also contain literal `workspace.fintech_jobs` references:
 
-- `00_setup/00_environment_setup.sql`
-- `01_tasks/01_ingesting_applications.py`
+- `00_setup/00_environment_setup.ipynb`
+- `01_tasks/01_ingesting_applications.ipynb`
 - `01_tasks/02_ingesting_customers_sql.sql`
 - `02_validation/01_validate_customers_staging_sql.sql`
 - `02_validation/02_query_staging_tables_sql.sql`
@@ -66,7 +66,7 @@ Both the person configuring the job and the job's run identity need the appropri
 
 ## 5. Select your own monitoring identifiers
 
-`02_validation/05_monitor_fintech_job_runs.py` uses placeholders for monitoring identifiers:
+`02_validation/05_monitor_fintech_job_runs.ipynb` uses placeholders for monitoring identifiers:
 
 | Widget | Placeholder |
 | --- | --- |
